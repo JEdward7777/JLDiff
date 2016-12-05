@@ -29,12 +29,17 @@ from collections import defaultdict
 import sys
 import cgi
 
+STATE_PASSING_1ST = 0
+STATE_PASSING_2ND = 1
+STATE_MATCH = 2
+
 
 class lineCompIndex:
     errorCount = 0
     previouse = None
-    isMatch = False
-    isPassing2nd = False
+    state = STATE_PASSING_1ST
+    #isMatch = False
+    #isPassing2nd = False
     content = ""
     
 
@@ -57,7 +62,7 @@ def main( argv ):
 
             #init the root root
             thisIndex = lineCompIndex()
-            thisIndex.isMatch = True
+            thisIndex.state = STATE_MATCH
             thisLine.append( thisIndex );
 
             #init the root top case
@@ -67,7 +72,7 @@ def main( argv ):
                 thisIndex.previouse = thisLine[ columnIndex-1 ]
                 thisIndex.errorCount = thisIndex.previouse.errorCount+1
                 thisIndex.content = char2
-                thisIndex.isPassing2nd = True
+                thisIndex.state = STATE_PASSING_2ND
                 thisLine.append( thisIndex )
                 columnIndex += 1
                 
@@ -82,7 +87,7 @@ def main( argv ):
                 thisIndex.previouse = lastLine[ 0 ]
                 thisIndex.errorCount = thisIndex.previouse.errorCount+1
                 thisIndex.content = char1
-                thisIndex.isPassing2nd = False
+                thisIndex.state = STATE_PASSING_1ST
                 thisLine.append( thisIndex )
 
                 columnIndex = 1
@@ -93,22 +98,22 @@ def main( argv ):
                         thisIndex.previouse = lastLine[ columnIndex-1 ]
                         #To keep from getting speriouse single matches,
                         #see about adding some error in for the first matches.
-                        if thisIndex.previouse.isMatch:
+                        if thisIndex.previouse.state == STATE_MATCH:
                             thisIndex.errorCount = thisIndex.previouse.errorCount
                         else:
                             thisIndex.errorCount = thisIndex.previouse.errorCount #+ 1
                     
-                        thisIndex.isMatch = True
+                        thisIndex.state = STATE_MATCH
                         thisIndex.content = char2
                     else:
                         if lastLine[ columnIndex ].errorCount < thisLine[ columnIndex-1 ].errorCount:
                             thisIndex.previouse = lastLine[ columnIndex ]
                             thisIndex.content = char1
-                            thisIndex.isPassing2nd = False
+                            thisIndex.state = STATE_PASSING_1ST
                         else:
                             thisIndex.previouse = thisLine[ columnIndex-1 ]
                             thisIndex.content = char2
-                            thisIndex.isPassing2nd = True
+                            thisIndex.state = STATE_PASSING_2ND
                             
                         thisIndex.errorCount = thisIndex.previouse.errorCount+1
 
@@ -136,13 +141,13 @@ def main( argv ):
             if nodeToPrint.content == "\n":
                 outputFile.write( "<br>\n" )
             else:
-                if(nodeToPrint.isMatch):
+                if(nodeToPrint.state == STATE_MATCH):
                     if not isblack:
                         outputFile.write( "</font>" )
                         isblack = True
                         isred = False
                         isgreen = False
-                elif(nodeToPrint.isPassing2nd ):
+                elif(nodeToPrint.state == STATE_PASSING_2ND ):
                     if not isred:
                         if not isblack:
                             outputFile.write( "</font>" )
