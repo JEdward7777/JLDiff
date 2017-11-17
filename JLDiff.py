@@ -42,7 +42,7 @@ class lineCompIndex:
     #isMatch = False
     #isPassing2nd = False
     content = ""
-    
+
 
 def main( argv ):
     if( len( argv ) < 3 ):
@@ -76,7 +76,7 @@ def main( argv ):
                 thisIndex.state = STATE_PASSING_2ND
                 thisLine.append( thisIndex )
                 columnIndex += 1
-                
+
             for char1 in file1:
                 lastLine = thisLine
                 thisLine = []
@@ -94,7 +94,7 @@ def main( argv ):
                 columnIndex = 1
                 for char2 in file2:
                     thisIndex = lineCompIndex()
-        
+
                     if( char2 == char1 ):
                         thisIndex.previouse = lastLine[ columnIndex-1 ]
                         #To keep from getting speriouse single matches,
@@ -103,7 +103,7 @@ def main( argv ):
                             thisIndex.errorCount = thisIndex.previouse.errorCount
                         else:
                             thisIndex.errorCount = thisIndex.previouse.errorCount #+ 1
-                    
+
                         thisIndex.state = STATE_MATCH
                         thisIndex.content = char2
                     else:
@@ -115,7 +115,7 @@ def main( argv ):
                             thisIndex.previouse = thisLine[ columnIndex-1 ]
                             thisIndex.content = char2
                             thisIndex.state = STATE_PASSING_2ND
-                            
+
                         thisIndex.errorCount = thisIndex.previouse.errorCount+1
 
                     thisLine.append( thisIndex )
@@ -137,7 +137,7 @@ def main( argv ):
                 answer = cgi.escape( inputStr ).encode( "utf-8" )
             return answer
 
-        
+
         for nodeToPrint in nodesToPrint:
             if nodeToPrint.content == "\n":
                 outputFile.write( "<br>\n" )
@@ -166,7 +166,7 @@ def main( argv ):
                         isgreen = True
 
                 outputFile.write( escape( nodeToPrint.content ) )
-                
+
         if not isblack:
             outputFile.write( "</font>" )
             isblack = True
@@ -178,7 +178,7 @@ def main( argv ):
     while not currentNode is None:
         backwardsList.append( currentNode )
         currentNode = currentNode.previouse
-            
+
     with open( output, 'w' ) as outFile:
         outFile.write( "<html><head><title>diff of " + filename1 + " and " + filename2 + "</title>\n" );
         outFile.write( "<meta http-equiv='Content-Type' content='text/html; charset=utf-8' /></head>\n<body>\n" );
@@ -188,8 +188,8 @@ def main( argv ):
 
         outFile.write( "</body>\n" );
         outFile.write( "</html>\n" );
-        
-                
+
+
 
 if __name__ == "__main__":
     main(sys.argv[1:])
