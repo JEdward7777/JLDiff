@@ -28,6 +28,7 @@ from collections import defaultdict
 
 import sys
 import cgi
+import codecs
 
 STATE_PASSING_1ST = 0
 STATE_PASSING_2ND = 1
@@ -46,14 +47,14 @@ class lineCompIndex:
 def main( argv ):
     if( len( argv ) < 3 ):
         print "Usage: JDiff file1 file2 resultFile"
-        exit
+        exit(1)
 
     filename1 = argv[0]
     filename2 = argv[1]
     output =    argv[2]
 
-    with open( filename1, 'r' ) as fileHandle1:
-        with open( filename2, 'r' ) as fileHandle2:
+    with codecs.open( filename1, 'r', 'utf-8' ) as fileHandle1:
+        with codecs.open( filename2, 'r', 'utf-8' ) as fileHandle2:
             file1 = fileHandle1.read()
             file2 = fileHandle2.read()
 
@@ -133,7 +134,7 @@ def main( argv ):
             elif inputStr == "\t":
                 answer = "&nbsp;&nbsp;&nbsp;"
             else:
-                answer = cgi.escape( inputStr )
+                answer = cgi.escape( inputStr ).encode( "utf-8" )
             return answer
 
         
@@ -151,7 +152,7 @@ def main( argv ):
                     if not isred:
                         if not isblack:
                             outputFile.write( "</font>" )
-                        outputFile.write( "<font size='5' color='green'>" )
+                        outputFile.write( "<font color='green'>" )
                         isblack = False
                         isred = True
                         isgreen = False
@@ -159,7 +160,7 @@ def main( argv ):
                     if not isgreen:
                         if not isblack:
                             outputFile.write( "</font>" )
-                        outputFile.write( "<font size='5' color='red'>" )
+                        outputFile.write( "<font color='red'>" )
                         isblack = False
                         isred = False
                         isgreen = True
@@ -179,8 +180,8 @@ def main( argv ):
         currentNode = currentNode.previouse
             
     with open( output, 'w' ) as outFile:
-        outFile.write( "<html><head><title>diff of " + filename1 + " and " + filename2 + "</title></head>\n" );
-        outFile.write( "<body>\n" );
+        outFile.write( "<html><head><title>diff of " + filename1 + " and " + filename2 + "</title>\n" );
+        outFile.write( "<meta http-equiv='Content-Type' content='text/html; charset=utf-8' /></head>\n<body>\n" );
 
         backwardsList.reverse()
         printDiffs( backwardsList, outFile )
