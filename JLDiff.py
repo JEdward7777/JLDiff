@@ -144,23 +144,23 @@ def main( argv ):
             else:
                 if(nodeToPrint.state == STATE_MATCH):
                     if not isblack:
-                        outputFile.write( "</font>" )
+                        outputFile.write( "</span>" )
                         isblack = True
                         isred = False
                         isgreen = False
                 elif(nodeToPrint.state == STATE_PASSING_2ND ):
                     if not isred:
                         if not isblack:
-                            outputFile.write( "</font>" )
-                        outputFile.write( "<font color='green'>" )
+                            outputFile.write( "</span>" )
+                        outputFile.write( "<span class='new'>" )
                         isblack = False
                         isred = True
                         isgreen = False
                 else:
                     if not isgreen:
                         if not isblack:
-                            outputFile.write( "</font>" )
-                        outputFile.write( "<font color='red'>" )
+                            outputFile.write( "</span>" )
+                        outputFile.write( "<span class='old'>" )
                         isblack = False
                         isred = False
                         isgreen = True
@@ -168,7 +168,7 @@ def main( argv ):
                 outputFile.write( escape( nodeToPrint.content ) )
 
         if not isblack:
-            outputFile.write( "</font>" )
+            outputFile.write( "</span>" )
             isblack = True
             isred = False
             isgreen = False
@@ -180,15 +180,11 @@ def main( argv ):
         currentNode = currentNode.previouse
 
     with open( output, 'w' ) as outFile:
-        outFile.write( "<html><head><title>diff of " + filename1 + " and " + filename2 + "</title>\n" );
-        outFile.write( "<meta http-equiv='Content-Type' content='text/html; charset=utf-8' /></head>\n<body>\n" );
+        outFile.write( "<!DOCTYPE html>\n<meta charset='utf-8'><title>diff of " + filename1 + " and " + filename2 + "</title>\n" );
+        outFile.write( "<style>\n.new{color:darkgreen}\n.old{color:red}\n</style>\n" );
 
         backwardsList.reverse()
         printDiffs( backwardsList, outFile )
-
-        outFile.write( "</body>\n" );
-        outFile.write( "</html>\n" );
-
 
 
 if __name__ == "__main__":
