@@ -43,15 +43,41 @@ class lineCompIndex(object):
         self.state = STATE_PASSING_1ST
         self.content = ""
 
+u_intern_dict = {}
+def u_intern( value ):
+    if value in u_intern_dict:
+        return u_intern_dict[value]
+    u_intern_dict[value]=value
+    return value
+
 
 def main( argv ):
-    if( len( argv ) < 3 ):
-        print "Usage: JDiff file1 file2 resultFile"
-        exit(1)
 
-    filename1 = argv[0]
-    filename2 = argv[1]
-    output =    argv[2]
+    filename1 = None
+    filename2 = None
+    output =    None
+    same_size = False
+
+    for arg in argv:
+        if arg.startswith( "-" ):
+            if arg == "--same_size":
+                same_size = True
+            else:
+                raise Exception( "Unknown arg " + arg )
+        else:
+            if not filename1:
+                filename1 = arg
+            elif not filename2:
+                filename2 = arg
+            elif not output:
+                output = arg
+            else:
+                raise Exception( "Extra argument " + arg ) 
+        
+
+    if not filename1 or not filename1 or not output:
+        print "Usage: JDiff file1 file2 resultFile [--same_size]"
+        exit(1)
 
     with codecs.open( filename1, 'r', 'utf-8' ) as fileHandle1:
         with codecs.open( filename2, 'r', 'utf-8' ) as fileHandle2:
@@ -72,7 +98,7 @@ def main( argv ):
                 thisIndex = lineCompIndex()
                 thisIndex.previouse = thisLine[ columnIndex-1 ]
                 thisIndex.errorCount = thisIndex.previouse.errorCount+1
-                thisIndex.content = intern(char2)
+                thisIndex.content = u_intern(char2)
                 thisIndex.state = STATE_PASSING_2ND
                 thisLine.append( thisIndex )
                 columnIndex += 1
@@ -87,7 +113,7 @@ def main( argv ):
                 thisIndex = lineCompIndex()
                 thisIndex.previouse = lastLine[ 0 ]
                 thisIndex.errorCount = thisIndex.previouse.errorCount+1
-                thisIndex.content = intern(char1)
+                thisIndex.content = u_intern(char1)
                 thisIndex.state = STATE_PASSING_1ST
                 thisLine.append( thisIndex )
 
@@ -105,15 +131,15 @@ def main( argv ):
                             thisIndex.errorCount = thisIndex.previouse.errorCount #+ 1
 
                         thisIndex.state = STATE_MATCH
-                        thisIndex.content = intern(char2)
+                        thisIndex.content = u_intern(char2)
                     else:
                         if lastLine[ columnIndex ].errorCount < thisLine[ columnIndex-1 ].errorCount:
                             thisIndex.previouse = lastLine[ columnIndex ]
-                            thisIndex.content = intern(char1)
+                            thisIndex.content = u_intern(char1)
                             thisIndex.state = STATE_PASSING_1ST
                         else:
                             thisIndex.previouse = thisLine[ columnIndex-1 ]
-                            thisIndex.content = intern(char2)
+                            thisIndex.content = u_intern(char2)
                             thisIndex.state = STATE_PASSING_2ND
 
                         thisIndex.errorCount = thisIndex.previouse.errorCount+1
@@ -186,8 +212,12 @@ def main( argv ):
         outFile.write( "<meta charset='utf-8'>\n" )
         outFile.write( "<title>diff of " + cgi.escape( filename1 ) + " and " + cgi.escape( filename2 ) + "</title>\n" );
         outFile.write( "<style>\n" )
-        outFile.write( ".new{color:darkgreen}\n" )
-        outFile.write( ".old{color:red}\n" )
+        if same_size:
+            outFile.write( ".new{color:darkgreen}\n" )
+            outFile.write( ".old{color:red}\n" )
+        else:
+            outFile.write( ".new{color:darkgreen;font-size: 25px;}\n" )
+            outFile.write( ".old{color:red;font-size: 25px;}\n" )
         outFile.write( "</style>\n" )
         outFile.write( "</head>\n" )
         outFile.write( "<body>\n" );
