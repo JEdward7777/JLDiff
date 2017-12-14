@@ -35,13 +35,13 @@ STATE_PASSING_2ND = 1
 STATE_MATCH = 2
 
 
-class lineCompIndex:
-    errorCount = 0
-    previouse = None
-    state = STATE_PASSING_1ST
-    #isMatch = False
-    #isPassing2nd = False
-    content = ""
+class lineCompIndex(object):
+    __slots__ = ['errorCount', 'previouse', 'state', 'content' ]
+    def __init__( self ):
+        self.errorCount = 0
+        self.previouse = None
+        self.state = STATE_PASSING_1ST
+        self.content = ""
 
 
 def main( argv ):
@@ -72,7 +72,7 @@ def main( argv ):
                 thisIndex = lineCompIndex()
                 thisIndex.previouse = thisLine[ columnIndex-1 ]
                 thisIndex.errorCount = thisIndex.previouse.errorCount+1
-                thisIndex.content = char2
+                thisIndex.content = intern(char2)
                 thisIndex.state = STATE_PASSING_2ND
                 thisLine.append( thisIndex )
                 columnIndex += 1
@@ -87,7 +87,7 @@ def main( argv ):
                 thisIndex = lineCompIndex()
                 thisIndex.previouse = lastLine[ 0 ]
                 thisIndex.errorCount = thisIndex.previouse.errorCount+1
-                thisIndex.content = char1
+                thisIndex.content = intern(char1)
                 thisIndex.state = STATE_PASSING_1ST
                 thisLine.append( thisIndex )
 
@@ -105,15 +105,15 @@ def main( argv ):
                             thisIndex.errorCount = thisIndex.previouse.errorCount #+ 1
 
                         thisIndex.state = STATE_MATCH
-                        thisIndex.content = char2
+                        thisIndex.content = intern(char2)
                     else:
                         if lastLine[ columnIndex ].errorCount < thisLine[ columnIndex-1 ].errorCount:
                             thisIndex.previouse = lastLine[ columnIndex ]
-                            thisIndex.content = char1
+                            thisIndex.content = intern(char1)
                             thisIndex.state = STATE_PASSING_1ST
                         else:
                             thisIndex.previouse = thisLine[ columnIndex-1 ]
-                            thisIndex.content = char2
+                            thisIndex.content = intern(char2)
                             thisIndex.state = STATE_PASSING_2ND
 
                         thisIndex.errorCount = thisIndex.previouse.errorCount+1
