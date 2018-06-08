@@ -79,8 +79,8 @@ def main( argv ):
         print "Usage: JDiff file1 file2 resultFile [--same_size]"
         exit(1)
 
-    with codecs.open( filename1, 'r', 'utf-8' ) as fileHandle1:
-        with codecs.open( filename2, 'r', 'utf-8' ) as fileHandle2:
+    with codecs.open( filename1, 'r', 'utf-8', errors='ignore' ) as fileHandle1:
+        with codecs.open( filename2, 'r', 'utf-8', errors='ignore' ) as fileHandle2:
             file1 = fileHandle1.read()
             file2 = fileHandle2.read()
 
