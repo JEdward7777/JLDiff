@@ -75,7 +75,7 @@ def main( argv ):
                 raise Exception( "Extra argument " + arg ) 
         
 
-    if not filename1 or not filename1 or not output:
+    if not filename1 or not filename2 or not output:
         print( "Usage: JLDiff file1 file2 resultFile [--same_size]" )
         exit(1)
 
