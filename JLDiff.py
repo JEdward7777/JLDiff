@@ -30,6 +30,13 @@ import sys
 import cgi
 import codecs
 
+if hasattr( cgi, "escape" ):
+    cgi_escape = cgi.escape
+else:
+    import html
+    cgi_escape = html.escape
+
+
 STATE_PASSING_1ST = 0
 STATE_PASSING_2ND = 1
 STATE_MATCH = 2
@@ -163,7 +170,7 @@ def main( argv ):
             elif inputStr == "\t":
                 answer = "&nbsp;&nbsp;&nbsp;"
             else:
-                answer = cgi.escape( inputStr )
+                answer = cgi_escape( inputStr )
             return answer
 
 
@@ -213,7 +220,7 @@ def main( argv ):
         outFile.write( "<html>\n" )
         outFile.write( "<head>\n" )
         outFile.write( "<meta charset='utf-8'>\n" )
-        outFile.write( "<title>diff of " + cgi.escape( filename1 ) + " and " + cgi.escape( filename2 ) + "</title>\n" )
+        outFile.write( "<title>diff of " + cgi_escape( filename1 ) + " and " + cgi_escape( filename2 ) + "</title>\n" )
         outFile.write( "<style>\n" )
         if same_size:
             outFile.write( ".new{color:darkgreen}\n" )
