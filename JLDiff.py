@@ -27,8 +27,12 @@ from __future__ import with_statement
 from collections import defaultdict
 
 import sys
-import cgi
 import codecs
+
+try:
+    import cgi
+except ImportError:
+    cgi = None  # so hasattr() won't crash
 
 if hasattr( cgi, "escape" ):
     cgi_escape = cgi.escape
