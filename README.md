@@ -8,7 +8,13 @@ This uses the [Longest common subsequence algorithm](https://en.wikipedia.org/wi
 
 ## Installation
 
-### As a library in another project
+### From PyPI
+
+```bash
+pip install JLDiff
+```
+
+### From GitHub (development version)
 
 ```bash
 # With uv
@@ -21,6 +27,10 @@ pip install git+https://github.com/JEdward7777/JLDiff.git
 ### Run as a one-off CLI without installing
 
 ```bash
+# From PyPI
+uvx jldiff file1.txt file2.txt out.html
+
+# From GitHub
 uv run --from git+https://github.com/JEdward7777/JLDiff.git jldiff file1.txt file2.txt out.html
 ```
 

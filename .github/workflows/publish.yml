@@ -1,0 +1,66 @@
+# Publish to PyPI using Trusted Publishing (OIDC — no API token needed).
+# Triggered when a GitHub Release is published.
+#
+# Prerequisites (one-time setup on PyPI):
+#   1. Go to https://pypi.org/manage/account/publishing/
+#   2. Add a "pending publisher" with:
+#        PyPI project name:  JLDiff
+#        Owner:              JEdward7777
+#        Repository:         JLDiff
+#        Workflow name:      publish.yml
+#        Environment name:   pypi
+#   3. In your GitHub repo → Settings → Environments, create an
+#      environment called "pypi" and enable "Required reviewers"
+#      so every publish needs manual approval.
+#
+# See: https://packaging.python.org/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows
+
+name: Publish to PyPI
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    name: Build distribution 📦
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.x"
+
+      - name: Install build tool
+        run: python3 -m pip install --user build
+
+      - name: Build sdist and wheel
+        run: python3 -m build
+
+      - name: Store distribution packages
+        uses: actions/upload-artifact@v5
+        with:
+          name: python-package-distributions
+          path: dist/
+
+  publish-to-pypi:
+    name: Publish to PyPI 🚀
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/JLDiff
+    permissions:
+      id-token: write  # mandatory for Trusted Publishing
+    steps:
+      - name: Download distribution packages
+        uses: actions/download-artifact@v6
+        with:
+          name: python-package-distributions
+          path: dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
