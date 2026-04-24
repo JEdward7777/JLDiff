@@ -1,0 +1,25 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "JLDiff"
+version = "1.0.0"
+description = "Character by character diff script written in python producing html output"
+readme = "README.md"
+license = {file = "LICENSE"}
+requires-python = ">=3.6"
+authors = [
+    {name = "Joshua Lansford"},
+]
+classifiers = [
+    "License :: OSI Approved :: BSD License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Text Processing :: General",
+]
+
+[project.scripts]
+jldiff = "JLDiff:main_cli"
+
+[tool.hatch.build.targets.wheel]
+only-include = ["JLDiff.py"]

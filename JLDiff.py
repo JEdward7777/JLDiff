@@ -64,7 +64,7 @@ class lineCompIndex(object):
         result += " e" + str( self.errorCount )
         result += " " + self.content
         return result
-    
+
     def __repr__(self) -> str:
         return str(self)
 
@@ -230,8 +230,8 @@ def main( argv ):
             elif not output:
                 output = arg
             else:
-                raise Exception( "Extra argument " + arg ) 
-        
+                raise Exception( "Extra argument " + arg )
+
 
     if not filename1 or not filename2 or not output:
         print( "Usage: JLDiff file1 file2 resultFile [--same_size]" )
@@ -262,10 +262,13 @@ def main( argv ):
         outFile.write( "<body>\n" )
 
         printDiffs( result, outFile )
-        
+
         outFile.write( "</body>\n" )
         outFile.write( "</html>\n" )
 
 
-if __name__ == "__main__":
+def main_cli():
     main(sys.argv[1:])
+
+if __name__ == "__main__":
+    main_cli()
