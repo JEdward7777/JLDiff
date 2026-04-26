@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "JLDiff"
-version = "1.0.0"
+version = "1.1.0"
 description = "Character by character diff script written in Python producing HTML output"
 readme = "README.md"
 license = "BSD-2-Clause"

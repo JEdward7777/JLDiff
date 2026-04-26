@@ -1,10 +1,12 @@
 # JLDiff
 
-Character by character diff script written in Python producing HTML output — with optional word-level diffing.
+Character by character diff script written in Python producing HTML output — with optional word-level diffing and match coalescence.
 
 This uses the [Longest common subsequence algorithm](https://en.wikipedia.org/wiki/Longest_common_subsequence_problem) to do a true character-by-character comparison — no line-by-line preprocessing. The result is HTML with red and green coloring showing exactly what changed.
 
 A `--word_level` mode tokenizes input into words, whitespace, and punctuation, then diffs at the token level for cleaner, faster results on natural language text.
+
+A `--min_match N` option merges short coincidental matches (fewer than N characters) into surrounding changes, producing cleaner diffs with fewer small fragments.
 
 > **Note:** Larger files take exponentially longer to process due to the nature of the algorithm. Word-level mode significantly reduces processing time by operating on tokens instead of individual characters.
 
@@ -41,13 +43,14 @@ uv run --from git+https://github.com/JEdward7777/JLDiff.git jldiff file1.txt fil
 ### Command line
 
 ```bash
-jldiff file1.txt file2.txt out.html [--same_size] [--word_level]
+jldiff file1.txt file2.txt out.html [--same_size] [--word_level] [--min_match N]
 ```
 
 | Flag | Description |
 |------|-------------|
 | `--same_size` | Keep diff text the same size as surrounding text (by default, changed text is rendered larger for visibility). |
 | `--word_level` | Diff at the token level instead of character level. Tokens are groups of alphabetical characters, whitespace, or other characters. Produces cleaner whole-word diffs and runs significantly faster on large files. |
+| `--min_match N` | Minimum match length to keep. Match groups shorter than N characters are merged into surrounding changes, reducing noise from small coincidental matches. Accepts `--min_match N` or `--min_match=N`. Works with both character-level and word-level diffs. |
 
 ### As a library
 
@@ -109,12 +112,35 @@ tokens = tokenize("hello123 world", classifier=my_classifier)
 # ['hello', '123', ' ', 'world']
 ```
 
+#### Match coalescence
+
+When a diff contains many small coincidental matches that fragment the output, use `coalesce_diff` to merge them into surrounding changes:
+
+```python
+from JLDiff import compute_diff, coalesce_diff, printDiffs
+
+result = compute_diff("The quick brown fox", "The slow red fox", talk=False)
+
+# Merge match groups shorter than 3 characters into surrounding changes
+result = coalesce_diff(result, min_match=3)
+
+with open("out.html", "w") as f:
+    printDiffs(result, f)
+```
+
+`coalesce_diff` works on output from both `compute_diff` and `compute_diff_by_words`. The `min_match` threshold always counts characters, even when operating on token-level diffs.
+
+The algorithm:
+1. Groups consecutive same-state nodes into single multi-character nodes
+2. Oblates (discards) any match group shorter than `min_match` characters, splitting it into a deletion + insertion
+3. Re-consolidates: between each pair of surviving matches, all deletions are collected into one node and all insertions into one node
+
 #### Building blocks
 
 For maximum control, use the individual functions:
 
 ```python
-from JLDiff import tokenize, compute_diff, flatten_diff, printDiffs
+from JLDiff import tokenize, compute_diff, coalesce_diff, flatten_diff, printDiffs
 
 # 1. Tokenize
 tokens1 = tokenize(text1)
@@ -123,15 +149,20 @@ tokens2 = tokenize(text2)
 # 2. Diff on tokens (compute_diff works on any sequence of comparable elements)
 token_diff = compute_diff(tokens1, tokens2, talk=False)
 
-# 3. Inspect token-level results directly
+# 3. Optionally coalesce short matches
+token_diff = coalesce_diff(token_diff, min_match=3)
+
+# 4. Inspect token-level results directly
 for node in token_diff:
     print(node.state, repr(node.content))
 
-# 4. Or flatten to character-level for HTML output
+# 5. Or flatten to character-level for HTML output
 char_nodes = list(flatten_diff(token_diff))
 ```
 
 `flatten_diff` is a generator that expands multi-character content nodes into single-character nodes. It's a transparent passthrough for character-level diffs (zero overhead).
+
+`coalesce_diff` returns a new list of nodes — it does not modify the input. When `min_match` is 1 or less, it returns a copy of the input unchanged.
 
 ## License
 
